@@ -1,0 +1,18 @@
+{% extends 'basic.html' %}
+{% block title %}视频选择{% endblock %}
+{% block content %}
+<div class="contaier" style="text-align: center">
+    <div style="height:80px; width:100%"></div>
+    <h3 style="color: white;text-align: center; width: 100%;">请选择示例视频</h3>
+
+    <div class="row img-rounded" style="color: white; width:60%; margin-top: 50px; display:block; margin: 0 auto;">
+        {% for d in data %}
+        <div class="col-md-4" style="text-align: center; padding-top: 20px;">
+            <a href="{{ d.url }}"> <img style="width:100%" src="{{d.cover_pic}}"></a>
+            <h5>{{ d.play_name }}</h5>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

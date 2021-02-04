@@ -1,0 +1,170 @@
+{% extends 'basic.html' %}
+
+{% block title %}数据列表{% endblock %}
+{% block content %}
+<link rel='stylesheet' href="{{  url_for('static', filename='layui/css/layui.css') }}">
+
+<body class="layui-layout-body" style="background-color: white;">
+    <div class="layui-layout layui-layout-admin">
+      <div class="layui-header">
+        <div class="layui-logo">实体列表</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+  
+      </div>
+      <!-- 内容主体区域 -->
+      <div style="padding: 15px;">
+        <button class="button layui-btn" data-toggle="modal" data-target="#myModal"> 添加实体 </button>
+        <button class="button layui-btn layui-btn-danger" id="delete_entity" data-type="getCheckData"> 删除实体 </button>
+        <button class="button layui-btn layui-btn-warm" disabled='true'> 温馨提示：双击表格项目可以查看实体详情 </button>
+        <table id="face_entity_table" lay-filter="test" style="color: white"></table>
+      </div>
+  
+  
+  
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">添加实体</h4>
+          </div>
+          <div class="modal-body">
+  
+            <div class="form-group">
+              <label for="input_entity_id">EntityId:</label>
+              <input class="form-control" id="input_entity_id" placeholder="实体 ID，可以包含数字、字母和下划线">
+            </div>
+            <div class="form-group">
+              <label for="input_labels">Labels:</label>
+              <input class="form-control" id="input_labels" placeholder="可输入多个 用,分割">
+            </div>
+            <div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <button type="button" class="btn btn-primary" id='submit_change'>提交更改</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal -->
+    </div>
+    
+    <script src="{{url_for('static', filename='layui/layui.js')}}"></script>
+    <script>
+      //JavaScript代码区域
+      layui.use('element', function () {
+        var element = layui.element;
+      });
+    </script>
+    <script>
+      function getUrlParam(name) { //获取参数
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象  
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数   
+        if (r != null) return unescape(r[2]); return null; //返回参数值  
+      }
+  
+      var getAppKey = function () {  //获取验证码
+        return 'fengximeng_test'
+      }
+  
+      var checkEntityId = function (value) {   //英文校验
+        var ext = /(^[\w]+$)/;
+        return ext.test(value);
+      }
+      layui.use('table', function () {
+        var table = layui.table;
+        //第一个实例
+        table.render({
+          elem: '#face_entity_table',
+          height: 700
+          , url: '/db/ListFaceEntities?app_key=' + getUrlParam('ak') //数据接口
+          , page: true //开启分页
+          , limit: 25
+          , cols: [[ //表头
+            { type: 'checkbox' },
+            { field: 'EntityId', title: 'EntityId', width: 180, sort: true }
+            , { field: 'UpdatedAt', title: '更新时间', sort: true, width: 280 }
+            , { field: 'Labels', title: '标签' }
+          ]]
+        });
+  
+        table.on('rowDouble(test)', function (obj) {
+          var entity_id = obj.data.EntityId;
+          window.location.href = ("/db/show_detail?ei=" + entity_id + '&ak=' + getUrlParam('ak'));
+        });
+  
+  
+  
+        var getCheckData = function () { //获取选中数据
+          var checkStatus = table.checkStatus('face_entity_table')
+            , data = checkStatus.data;
+          return data;
+        }
+        $('#delete_entity').click(function () {
+          var delete_data = getCheckData();
+          if (delete_data.length == 0) {
+            alert('您选择了0项。')
+          } else {
+            var truthBeTold = window.confirm("确认删除这" + delete_data.length.toString() + '项?');
+            if (truthBeTold) {
+              for (var i = 0; i < delete_data.length; i++) {
+                axios.get('/db/delete_entity?app_key='+getUrlParam('ak')+'&entity_id='+ delete_data[i]['EntityId'],)
+                  .then(function (response) {
+                    console.log(response);
+                    window.location.reload();
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              }
+            }
+          }
+  
+  
+  
+        })
+      });
+  
+  
+  
+      $('#submit_change').click(function () {
+        var entity_id = $('#input_entity_id').val()
+        var labels = $('#input_labels').val()
+  
+        console.log(getUrlParam('ak'))
+        if (checkEntityId(entity_id)) {
+          $.ajax({
+            type: "POST",
+            url: '/db/upload_entity',
+            data: {
+              "app_key": getUrlParam('ak'),
+              "entity_id": entity_id,
+              "labels": labels,
+            },    //视情况将base64的前面字符串data:image/png;base64,删除
+            cache: false,
+            success: function (data) {
+              console.log(data)
+              var code = data.Code;
+              console.log(code);
+              if (code == -5) {
+                alert('EntityId重复，请修改后重试')
+              } else if (code == 0) {
+                alert('上传成功！')
+                window.location.reload()
+              }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+              alert("上传失败，请检查网络后重试");
+            }
+          });
+        } else {
+          alert('请检查输入');
+        }
+      });
+  
+  
+    </script>
+  </body>
+{% endblock %}

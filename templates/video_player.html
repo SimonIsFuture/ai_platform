@@ -1,0 +1,104 @@
+{% extends 'basic.html' %}
+
+<title>{% block title %}
+    {{ title }}
+    {% endblock %} - Flaskr</title>
+{% block header %}{% endblock %}
+{% block content %}
+<div class="container" style="padding-top: 20px">
+    <div style="display: flex; flex-direction: row">
+        <div>
+            <video id="my_video" class="video-js" controls autoplay preload="auto" width="670" height="380"
+                poster="http://www.ibenrobot.com/static/uploadfile/ckedit/1575687406.jpg">
+
+                <source src="{{ video_src }}" type="video/mp4">
+                <source src="http://182.42.255.14:7000/dth.mp4" type="video/ogg">
+            </video>
+        </div>
+        <div class="right-container lighter-container container" style="margin-left: 10px">
+            <div style="padding-top: 10px">
+                视频类型：
+                <span class="label label-default">国产</span>
+                <span class="label label-default">电视剧</span>
+            </div>
+            <div style="padding-top: 10px">
+                视频标签：
+                <span class="label label-default">国产电视剧</span>
+            </div>
+            <div style="padding-top: 10px">
+                剧照：
+                <div class="row">
+                    <img src="http://5b0988e595225.cdn.sohucs.com/images/20190225/bbe42cc9ff2e4626985fbcc8aa82d340.jpeg" class="col-sm-4" />
+                    {% for face_time in face_timeline %}
+                    <!-- <img src="{{ face_time.actor_image }}" class="col-sm-4" /> -->
+                    {% endfor %}
+                </div>
+            </div>
+            <div style="padding-top:20px">实时语音识别：
+                <h4 id='subtitle'></h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="lighter-container">
+                    <ul class="nav navbar-default navbar-inverse nav-justified">
+                        <li ><a href="#">人脸识别</a></li>
+                        <li><a href="#">..识别</a></li>
+                      </ul>
+
+                </div> -->
+    <!--main body-->
+
+    <!--end of main body-->
+    <!-- </div> -->
+
+    <div class="container lighter-container col-lg-12 " style="margin-top: 10px; color: whitesmoke">
+        <h4 style="padding-top:10px;">人脸库选择</h4>
+        <div class="row">
+            {% for face_time in face_timeline %}
+            <div class="actor-image-container col-sm-1" style="height:100px;" actor_id="{{ face_time.actor_id }}">
+                <a><img click="true" src="{{ face_time.actor_image }}" class="video-shortcut" /></a>
+                <span style="color: whitesmoke; padding-top:20px;">{{face_time.actor_name}}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <h4 style="padding-top:10px;">人物出现时间</h4>
+        <canvas width="500px" height="20px" style="background-color: black" id="process_bar"></canvas>
+        <div height="30px" width="1px"> </div>
+        <div class="row" style="height: 200px; overflow:auto; padding-left:20px">
+            {% for time in occur_time %}
+            <a class="occur_time" style="color: whitesmoke; background-color: transparent;">
+                <h5>{{ time }}0</h5>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<div id='data_container' actor_id="{{ actor_id }}" video_current_time="{{ current_time }}" play_id="{{ play_id }}"></div>
+<script src=" {{url_for('static', filename='js/video_player.js')}} "></script>
+<script>
+    // 简单的点击逻辑写在这里
+    $(document).ready(function(){
+        //播放字幕
+        
+        //自动追踪播放时间
+        var time = $('#data_container').attr("video_current_time")
+        var min = parseInt(time.split(':')[0])
+        var sec = parseFloat(time.split(':')[1])
+        time = min * 60 + sec
+        document.getElementById("my_video").currentTime = parseFloat(time)
+    })
+    $('.actor-image-container').click(function () {
+        var actor_id = $(this).attr('actor_id');
+        var cur_time = document.getElementById("my_video").currentTime
+        window.location.href = '/video/show_detail?play_id='+ $('#data_container').attr('play_id') + '&actor_id=' + actor_id.toString() + '&current_time=' + cur_time.toString();
+    })
+    $('.occur_time').click(function () {
+        var time = $(this).text()
+        var min = parseInt(time.split(':')[0])
+        var sec = parseFloat(time.split(':')[1])
+        time = min * 60 + sec
+        document.getElementById("my_video").currentTime = time
+    })
+</script>
+{% endblock %}

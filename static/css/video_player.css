@@ -1,0 +1,17 @@
+.right-container {
+  height: 380;
+  width: 100%;
+  color: whitesmoke;
+}
+.video-shortcut {
+  display: inline-block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+.actor-image-container {
+  color: whitesmoke;
+  text-align: center;
+  height: 50px;
+  width: 100%;
+}

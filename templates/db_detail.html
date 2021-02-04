@@ -1,0 +1,201 @@
+{% extends 'basic.html' %}
+{% block title %}人脸详细信息{% endblock %}
+{% block content %}
+<style>
+    .face_entity_container {
+      border: solid lightgray 1px;
+      margin:  5px 5px 5px 5px;
+      border-radius: 5px;
+      height: 180px;
+      width: auto;
+    }
+  
+    .imgdiv {
+      width: 100px;   
+      height: 100px;    
+      background-image: url(/your/image/path.jpg);
+      background-position: center center;    
+      background-size: cover;              
+      background-repeat: no-repeat;
+  }
+    .image_chosen {
+      border: 2px black solid;
+    }
+  
+  
+    .info {
+      font-size: 20px;
+    }
+  </style>
+  
+  <body class="layui-layout-body">
+  
+    <div class="layui-layout layui-layout-admin">
+  
+      <div class="container" style="margin-top: 10px;">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">人员ID: {{EntityId}}</li>
+            <li class="breadcrumb-item active" aria-current="page"> 人员标签: {{Labels}}</li>
+            <li class="breadcrumb-item active" aria-current="page"> 人脸数量: {{FacesCount}}</li>
+          </ol>
+        </nav>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">添加人脸样本:&nbsp;<input type="file" val='添加人脸样本'
+                id="articleImgBtn"></input></li>
+          </ol>
+        </nav>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page"> <input type="button" id="delete_samples"
+                class="btn btn-danger" value="删除人脸样本"></input></input></li>
+          </ol>
+        </nav>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb" >
+            <div class="contianer" style="padding: 6px 4px 6px 4px;">
+              <div style="text-align: left;" class="row">
+                {% for face in Faces %}
+                <img class="face_entity_container " face_id="{{face['FacedId']}}"
+                  src="data:image/png;base64,{{face['ImageData']}}">
+                {% endfor %}
+              </div>
+             
+            </div>
+  
+          </ol>
+        </nav>
+  
+      </div>
+      <div>
+  
+  
+      </div>
+    </div>
+  
+  
+  
+  
+  
+    </div>
+
+  
+    <script>
+      //删除图片的url
+      var delete_pic = function (face_ids) {
+  
+        for (var i = 0; i < face_ids.length; i++) {
+          axios.get('/db/delete_face', {
+            params: {
+              face_id: face_ids[i],
+              ak: getUrlParam('ak')
+            }
+          }).then(
+            function (response) {
+              console.info(response)
+              window.location.reload()
+            }
+          )
+        }
+      }
+  
+      $(document).ready(
+  
+        $('#delete_samples').click(function () {
+          $(this).addClass("btn_delete_confirm");
+          $(this).val('确认删除');
+          $('.face_entity_container').addClass('face_entity_selected');
+          $('.face_entity_selected').click(function () {
+            var chosen_class = "image_chosen";
+            var cur_classes = $(this).attr("class").split(" ");
+            if (!cur_classes.includes(chosen_class)) {
+              $(this).addClass("image_chosen");
+            } else {
+              $(this).removeClass("image_chosen");
+            }
+          });
+          //点击确认删除后
+          $(".btn_delete_confirm").click(function () {
+            face_id = $('.image_chosen').map(function () {
+              return ($(this).attr("face_Id"));
+            }).get()
+            delete_pic(face_id);
+          })
+        })
+      );
+  
+    </script>
+    <script>
+      $('#articleImgBtn').change(function () {
+        run(this, function (data) {
+          uploadImage(data);
+        });
+      });
+      //In this script is the main function of unload files
+      function run(input_file, get_data) {
+        /*input_file：文件按钮对象*/
+        /*get_data: 转换成功后执行的方法*/
+        if (typeof (FileReader) === 'undefined') {
+          alert("抱歉，你的浏览器不支持 FileReader，不能将图片转换为Base64，请使用现代浏览器操作！");
+        } else {
+          try {
+            /*图片转Base64 核心代码*/
+            var file = input_file.files[0];
+            //这里我们判断下类型如果不是图片就返回 去掉就可以上传任意文件  
+            if (!/image\/\w+/.test(file.type)) {
+              alert("请确保文件为图像类型");
+              return false;
+            }
+            var reader = new FileReader();
+            reader.onload = function () {
+              get_data(this.result);
+            }
+            reader.readAsDataURL(file);
+          } catch (e) {
+            alert('图片转Base64出错啦！' + e.toString())
+          }
+        }
+      }
+      function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象  
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数   
+        if (r != null) return unescape(r[2]); return null; //返回参数值  
+      }
+      function uploadImage(img) {
+        //判断是否有选择上传文件
+        var imgPath = $("#articleImgBtn").val();
+        if (imgPath == "") {
+          alert("请选择上传图片！");
+          return;
+        }
+        //判断上传文件的后缀名
+        var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+        if (strExtension != 'jpg' && strExtension != 'png'  && strExtension != 'jpeg') {
+          alert("请选择图片文件");
+          return;
+        }
+        file_data = img.substr(img.indexOf(',') + 1)
+        data = file_data
+        data = ((data)).replace(/\//g, "_")
+        data = data.replace(/\+/g, "-")
+  
+        $.ajax({
+          type: "POST",
+          url: '/db/upload_face',
+          data: { file: data, ei: getUrlParam('ei'), ak: getUrlParam('ak') },    //视情况将base64的前面字符串data:image/png;base64,删除
+          cache: false,
+          success: function (data) {
+            alert("上传成功");
+            window.location.reload();
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("上传失败，请检查网络后重试");
+          }
+        });
+      }
+  
+  
+    </script>
+  </body>
+{% endblock %}

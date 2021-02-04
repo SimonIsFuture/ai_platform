@@ -1,0 +1,40 @@
+{% extends 'basic.html' %}
+{% block title %}视频选择{% endblock %}
+{% block content %}
+<!-- 内容主体区域 -->
+<div class="panel panel-default">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">请输入您的邮箱</h3>
+        </div>
+        <div class="panel-body">
+            <input type="text" id="mail_holder" name="title" required lay-verify="required" placeholder="请输入您的邮箱"
+                autocomplete="off" class="layui-input">
+            <button type="button" class="layui-btn" id="btn_confirm" style="margin-top: 10px;">确认</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function check() {
+        var reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"); //正则表达式
+        var obj = document.getElementById("mail_holder"); //要验证的对象
+        if (obj.value === "") { //输入不能为空
+            alert("输入不能为空!");
+            return false;
+        } else if (!reg.test(obj.value)) { //正则验证不通过，格式不对
+            alert("验证不通过!请检查输入");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    $('#btn_confirm').click(function () {
+        if (check()) {
+            var obj = document.getElementById("mail_holder").value; //要验证的对象
+            window.location.replace("/db/show?ak=" + obj);
+        }
+
+    });
+</script>
+{% endblock %}

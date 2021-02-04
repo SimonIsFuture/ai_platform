@@ -1,0 +1,4 @@
+[
+    {"play_id": 0, "play_name": "都挺好","play_length": 175, "cover_pic": "/static/picture/dth/dth_cover.jpg", "url": "/video/show_detail?play_id=0", "subtitle_path": "data/subtitle/subtitle_dth.txt", "face_data_path": "data/time_dth.json", "video_path": "/static/video/dth.mp4"},
+    {"play_id": 1, "play_name": "有翡", "play_length": 525, "cover_pic": "/static/picture/youfei/youfei_cover.jpg", "url": "/video/show_detail?play_id=1", "subtitle_path": "data/subtitle/subtitle_yf.txt", "face_data_path": "data/time_yf.json", "video_path": "/static/video/yf.mp4"}
+]
