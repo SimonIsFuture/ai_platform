@@ -69,7 +69,7 @@ def gen_prcoess_bar():
     actor_id = int(request.args.get('actor_id')) if request.args.get('actor_id') != None else 0
     play_id = int(request.args.get('play_id')) if request.args.get('play_id') != None else 0
     play_data = util.load_json_data('data/canidate_play.json')[play_id]
-    print(play_data)
+    #print(play_data)
     total_video_length = int(play_data['play_length'])
     json_data = util.load_json_data(play_data['face_data_path'])
     ouccr_time_list = [ (int(x.split(':')[0]) * 60 + round(float((x.split(':')[1]))) ) for x in json_data[int(actor_id)]['occur_time']]

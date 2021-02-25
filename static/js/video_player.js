@@ -50,5 +50,5 @@ function change_subtitle(){
 }
 
 draw_canvas()
-interval_face_detection()
+//interval_face_detection()
 change_subtitle()
