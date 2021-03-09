@@ -1,9 +1,10 @@
 # some lib packages...
 import json
 import logging as log
+import base64
+import _io
 
 class Utils:
-
     @staticmethod
     def load_json_data(json_file_path: str):
         data = ''
@@ -22,6 +23,8 @@ class Utils:
         import json
         import requests
         data = json.loads(data)
+        print('---------------------->Begin to request ACTION {}'.format(data['Action']))
+        print('---------------------->Request data is {}'.format(data))
         # print(data)
         target_url = data['URL']
         action = data['Action']
@@ -59,3 +62,13 @@ class Utils:
     # data = ((data.image.split(','))[1]).replace(/\//g, "_")
 	# data = data.replace(/\+/g, "-")
         return base_64_data.replace("-", "+").replace("_", "/")
+
+    @staticmethod
+    def CovertPictureToBase64Data(img_data: str):
+        # 把图片转换成为Base64的数据
+        #
+        return str(base64.urlsafe_b64encode(img_data), "utf-8")
+
+
+# if __name__ == '__main__':
+#     print(Utils.CovertPictureToBase64Data(open('temp/259612838874106710.jpg', 'rb').read()))

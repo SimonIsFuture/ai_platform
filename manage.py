@@ -1,13 +1,14 @@
 from flask import Flask, render_template, send_from_directory, Response
 from video_handler import video_opt
 from db_handler import db_manage_opt
+from pic_handler import pic_manage_opt
 app = Flask(__name__)
 # 注册蓝图，并指定其对应的前缀（url_prefix）
 app.register_blueprint(video_opt, url_prefix="/video")
 app.register_blueprint(db_manage_opt, url_prefix="/db")
+app.register_blueprint(pic_manage_opt, url_prefix="/pic")
 
-
-@app.route('/index')
+@app.route('/')
 def show_index():
     return render_template('index.html')
 

@@ -1,0 +1,16 @@
+{% extends 'basic.html' %}
+{% block title %}人脸详细信息{% endblock %}
+{% block content %}
+<div class="container" style="padding-top: 20px; width:80%" >
+    <div style="text-align: center" width="">
+        <img style="width: auto; height: 500px" src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fimages%2F20180322%2F5316fd0d65674f03b4c02ecb4004c3d4.jpeg&refer=http%3A%2F%2F5b0988e595225.cdn.sohucs.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1616912795&t=40026e1132052d5bfb1fac291d9a6e2a">
+        <form method="POST" action="/pic/upload_pic" enctype="multipart/form-data" width="60%" style="display: flex;align-items: center;justify-content: center; padding-top: 30px;">
+            <input class="btn btn-default" type="file" name="content_pic" style='width: 50%'>
+            <input class="btn  btn-primary" type="submit" value="点击上传">
+        </form>
+        <div style="background-color: aliceblue;">
+            测试结果
+        </div>
+    </div>
+</div>
+{% endblock %}

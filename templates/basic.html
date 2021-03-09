@@ -50,7 +50,14 @@
                     <li>
                         <a href="#">语音<span class="sr-only">(current)</span></a>
                     </li>
-                    <li><a href="#">图像</a></li>
+                    <li class="dropdown">
+                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">图像<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/pic/content_audit">内容审核</a></li>
+
+                        </ul>
+                    </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                             aria-expanded="false">视频<span class="caret"></span></a>
@@ -68,7 +75,7 @@
         <!-- /.container-fluid -->
     </nav>
     <header>{% block header %}{% endblock %}</header>
-    {% block content %}{% endblock %} 　
+    {% block content %}{% endblock %}
 </body>
 
 </html>
