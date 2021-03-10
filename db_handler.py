@@ -62,7 +62,7 @@ def ListFaceEntities():
                 'Token': TOKEN
             }
         res = post_data(json.dumps(data))
-        print(res)
+        
         
         if res['Code'] == -6:
             log.info('{} has not registered yet.'.format(appkey))
