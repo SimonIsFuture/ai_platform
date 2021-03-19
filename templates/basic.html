@@ -19,6 +19,8 @@
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <!-- 加载vue.js  -->
+    <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
 </head>
 
 <style>
@@ -55,7 +57,7 @@
                             aria-expanded="false">图像<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a href="/pic/content_audit">内容审核</a></li>
-
+                            <li><a href="/obs?f=show">人脸搜索</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">

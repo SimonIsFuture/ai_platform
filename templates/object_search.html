@@ -1,0 +1,272 @@
+{% extends 'basic.html' %}
+<title>{% block title %}
+    人脸搜索
+    {% endblock %} </title>
+{% block header %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="http://www.jq22.com/jquery/swiper.min.css">
+<script src="http://www.jq22.com/jquery/swiper.min.js"> </script>
+ <link rel="stylesheet"   href="{{ url_for('static', filename='css/object_search.css') }}">
+{% endblock %}
+{% block content %}
+<style>
+        .swiper-container {
+            width: 100%;
+            height: 100%;
+            /* padding-top: 10px; */
+            padding-left: 10px;
+        }
+
+        .swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            background: #fff;
+            width: 120px;
+            height: 120px;
+            /* Center slide text vertically */
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+
+        }
+    </style>
+<body>
+    <div class="jumbotron jumbotron-container">
+        <div class='container jumbotron-inner-container'>
+            <h1 style="color:whitesmoke">人脸搜索</h1>
+            <p style="color:whitesmoke">Face Retrieval</p>
+            <!-- <p>精准实时的人脸检测、分析、识别等服务，在线、离线满足多样需求...</p> -->
+            <p>
+                <!-- <a class="btn btn-primary btn-lg" href="#" role="button">立即选购</a>
+                <a class="btn btn-lg" href="#" role="button">产品文档</a> -->
+            </p>
+        </div>
+    </div>
+    <div class='middle-title'>
+        <h3 style="color:whitesmoke">功能演示</h3>
+    </div>
+
+    <div id='main-app'>
+        <div class='function-container container'>
+            <div class="img-container">
+                <div class="show-img-container">
+                    <img :src="show_img.src" class="img-avatar" alt="Responsive image">
+                </div>
+
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+
+                        <div v-for="canidate in canidates" class="swiper-slide" style="width: 100px;">
+                            <div class='canidate-container'>
+                                <span style="position: absolute;z-index: 1;left: 0px;font-size:3px;"
+                                    class="label label-primary" v-if=" canidate.dist !== 0 " style="background:lightgray;">分数:{[ canidate.dist ]}</span>
+                                    <span style="position: absolute;z-index: 1;left: 0px;font-size:3px;"
+                                    class="label label-primary" style="background: transparent;" v-else ></span>
+                                <div class='img-canidate-container'>
+                                    <img :src="canidate.src" class="img-candidate" alt="Responsive image">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="post-container" style="background:lightgray;">
+                        识别结果:<br>
+                        <p v-for="(canidate, index) in canidates">
+                            Top{[ index ]}: {[ canidate.dist ]}
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div id="cupload">
+
+            </div>
+            <div class="modal fade loading" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                aria-hidden="true" data-backdrop="static" style="display: flex;text-align: center;width: 100%;" data-keyboard="false">
+                <p style="align-self: center;text-align: center;width: 100%;font-size: xx-large;">Loading...</p>
+            </div>
+
+        </div>
+    </div>
+
+
+</body>
+
+<script type="text/javascript">
+    function startup() {
+        $("#myModal").modal('show');
+        setTimeout('shutdown()', 5000);
+    }
+
+    function shutdown() {
+        $("#myModal").modal('hide');
+    }
+    //全局要使用的变量
+    var canidate_image_data = new Array();
+    var full_canidate_image_data = new Array();
+    var show_image_data = {}
+
+    //工具函数
+    var trans_src = (src) => {
+        var data = src.replace(/\_/g, "/");
+        data = data.replace(/\-/g, "+");
+        fianl_src = "data:image/jpeg;base64," + data;
+        return fianl_src;
+    }
+
+    //初始化页面
+    // Step1.建立占位图片
+    for (var i = 0; i < 100; i++) {
+        src = 'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1499455999,121187899&fm=26&gp=0.jpg'
+        canidate_image_data.push({ 'src': src, 'dist': '1.00' })
+    }
+    //step2.定义app
+    var app = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#main-app',
+        data: {
+            message: 'Hello Vue!',
+            show_img:
+                canidate_image_data[0]
+            ,
+            canidates: canidate_image_data
+        }
+    })
+    //上传图片，查看相似度
+    // var upload_pic = ()
+
+    var update_pic = (app, data) => {
+        full_canidate_image_data = data;
+        srcs = new Array();
+        for (var p of data) {
+            var _dist = p.dist;
+            if (_dist < 0.01) {
+                _dist = 0;
+            }
+            else {
+                _dist = Math.floor(_dist * 100)
+            }
+
+            srcs.push({
+                "src": trans_src(p.base_64_data_marked),
+                "dist": _dist
+            });
+        }
+        if (srcs.length < 100) {
+            for (var i = 0; i < 100 - srcs.length; i++) {
+                srcs.push({
+                    "src": "https://gss3.bdstatic.com/84oSdTum2Q5BphGlnYG/timg?wapp&quality=80&size=b150_150&subsize=20480&cut_x=0&cut_w=0&cut_y=0&cut_h=0&sec=1369815402&srctrace&di=ef5c2abca285e12f485612983db7e476&wh_rate=null&src=http%3A%2F%2Fimgsrc.baidu.com%2Fforum%2Fpic%2Fitem%2F2934349b033b5bb5f9fa0d0c38d3d539b600bc16.jpg",
+                    "dist": 0
+                })
+            }
+        }
+        canidate_image_data = srcs
+
+        app.canidates = srcs
+        app.show_img = srcs[0]
+
+        // 变化框框的颜色
+        var box = $('.swiper-slide');
+        box.each(function (index, ele) {
+            if (index == 0) {
+                $(this).addClass('selected');
+            }
+        });
+
+    }
+    //首次请求，加载初始图片
+    var load_intialize_pic = (app) => {
+        var data = {
+            'f': 'load_data',
+            'pic_num': 7
+        }
+        startup()
+        axios
+            .get("/obs?f=" + data['f'] + "&pic_num=" + data['pic_num'].toString())
+            .then(function (response) {
+                //修改图片源
+                data = response.data
+                update_pic(app, data)
+                shutdown()
+            })
+            .catch(function (error) {
+                shutdown()
+                console.log(error);
+            });
+    }
+
+
+    load_intialize_pic(app)
+
+    var modify_show_pic = (data) => {
+        console.log(data)
+        app.show_img.src = data.image
+    }
+
+</script>
+<script src=" {{url_for('static', filename='js/cupload.js')}} "></script>
+<script>
+    var cupload = new Cupload({
+        ele: "#cupload",
+        url: '/obs/',
+        num: 10,
+    });
+
+    var swiper = new Swiper('.swiper-container', {
+        slidesPerView: 7,
+        spaceBetween: 10,
+        pagination: {
+            //el: '.swiper-pagination',
+            clickable: true,
+        },
+    });
+
+    //上传图片信息的函数
+    var potsImageData = (data, full_data, success) => {
+        var post_data = {
+            "Action": "TopK",
+            "ImageData": data,
+            "DatSetData": full_data,
+            "URL": "http://182.42.255.14:8502/ai"
+        }
+        startup()
+        console.log(post_data)
+        axios.post('/obs/',
+            post_data, {headers: {'Content-Type': 'application/json'}}
+        )
+            .then(function (response) {
+                console.log(response);
+                //get_faces(data);
+                success(response);
+                update_pic(app, response.data)
+                shutdown()
+            })
+            .catch(function (error) {
+                shutdown()
+                console.log(error);
+            });
+    }
+    //绑定点击事件
+    $('.swiper-slide').click(
+        function () {
+            var index = $(this).index();
+            console.log(full_canidate_image_data)
+            var data = full_canidate_image_data[index]['base_64_data'];
+            potsImageData(data, full_canidate_image_data, () => { });
+        }
+    );
+</script>
+
+{% endblock %}

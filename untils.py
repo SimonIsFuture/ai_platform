@@ -23,8 +23,8 @@ class Utils:
         import json
         import requests
         data = json.loads(data)
-        print('---------------------->Begin to request ACTION {}'.format(data['Action']))
-        print('---------------------->Request data is {}'.format(data))
+        # print('---------------------->Begin to request ACTION {}'.format(data['Action']))
+        # print('---------------------->Request data is {}'.format(data))
         # print(data)
         target_url = data['URL']
         action = data['Action']
@@ -64,11 +64,12 @@ class Utils:
         return base_64_data.replace("-", "+").replace("_", "/")
 
     @staticmethod
-    def CovertPictureToBase64Data(img_data: str):
+    def CovertPictureToBase64Data(image_path: str):
         # 把图片转换成为Base64的数据
-        #
-        return str(base64.urlsafe_b64encode(img_data), "utf-8")
-
+        # 输入的是image_path
+        with open(image_path, "rb") as f:
+            encoded_string = str(base64.urlsafe_b64encode(f.read()), "utf-8")
+        return encoded_string
 
 # if __name__ == '__main__':
 #     print(Utils.CovertPictureToBase64Data(open('temp/259612838874106710.jpg', 'rb').read()))

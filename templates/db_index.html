@@ -15,6 +15,7 @@ content %}
       <button class="button layui-btn layui-btn-warm" id="current_database">当前:</button>
       <button class="button layui-btn layui-btn-danger">选择数据库</button>
       <select id="selector_db_name">
+        <option> 请选择数据库 </option>
         {% for db_name in db_names %}
         <option value="{{db_name.Name}}">{{db_name.Name}}</option>
         {% endfor %}
